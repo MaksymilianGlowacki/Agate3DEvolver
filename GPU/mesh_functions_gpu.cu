@@ -1,5 +1,6 @@
-#include "mesh_functions.h"
+#include "mesh_functions_gpu.cuh"
 
+__device__
 double distance_to_triangle(triangle t, double px, double py, double pz, size_t& inter)
 {
     double a, b;
@@ -76,7 +77,8 @@ double distance_to_triangle(triangle t, double px, double py, double pz, size_t&
     return std::sqrt(d1);
 }
 
-double distance_to_mesh(triangle *mesh, int x, int y, int z, size_t mesh_size)
+__device__
+double distance_to_mesh(triangle *mesh, unsigned int x, unsigned int y, unsigned int z, size_t mesh_size)
 {
     size_t intersected = 0;
     double d_min = distance_to_triangle(mesh[0], x, y, z, intersected), d;

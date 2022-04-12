@@ -1,6 +1,6 @@
-#include <iostream>
 #include <happly.h>
 #include <chrono>
+#include <algorithm>
 #include "mesh_functions.h"
 
 int main()
@@ -29,7 +29,7 @@ int main()
                                                       {return (a[2] < b[2]);}))[2]);
     const int X = max_x - min_x, Y = max_y - min_y, Z = max_z - min_z;
     auto *results = new double[X * Y * Z];
-    triangle mesh[fInd.size()];
+    auto *mesh = new triangle[fInd.size()];
 
     for(size_t i = 0; i < fInd.size(); ++i)
     {
@@ -58,6 +58,7 @@ int main()
         }
     }
     auto stop = std::chrono::high_resolution_clock::now();
+    delete[] mesh;
     std::cout << "Calculations took: " << std::chrono::duration<double, std::ratio<3600>>(stop - start).count() <<
         " hours\nSaving results to .txt file...\n";
     start = std::chrono::high_resolution_clock::now();

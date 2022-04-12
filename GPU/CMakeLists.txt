@@ -3,5 +3,8 @@ project(Agate3DEvolverGPU CUDA)
 
 set(CMAKE_CUDA_STANDARD 17)
 
-add_executable(Agate3DEvolverGPU main.cu ../mesh_functions.cpp ../mesh_functions.h)
-target_include_directories(Agate3DEvolverGPU PRIVATE /Users/maks/src.git/happly)
+add_executable(Agate3DEvolverGPU main.cu mesh_functions_gpu.cu mesh_functions_gpu.cuh)
+target_include_directories(Agate3DEvolverGPU PRIVATE "C:/Programming/Happly/happly")
+set_target_properties(Agate3DEvolverGPU PROPERTIES
+        CUDA_SEPARABLE_COMPILATION ON)
+target_compile_options(Agate3DEvolverGPU PRIVATE -Xcompiler /std:c++17)

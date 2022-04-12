@@ -1,24 +1,20 @@
-#include "../mesh_functions.h"
-#include <happly.h>
+#include "mesh_functions_gpu.cuh"
+#include <happly.h> //edited lines 954 & 997: dynamic_cast converted to static_cast (avoid compilation error)
+#include <algorithm>
+#include <chrono>
 
 __global__
-void calculate_distances(const int X, const int Y, const int Z, size_t num_tri, triangle *mesh, double *results)
+void calculate_distances(const int X, const int Y, size_t num_tri, triangle *mesh, double *results)
 {
-    for(int z = 0; z < Z; ++z)
-    {
-        for(int y = 0; y < Y; ++y)
-        {
-            for(int x = 0; x < X; ++x)
-            {
-                results[z * (X * Y) + y * X + x] = distance_to_mesh(mesh, x, y, z, num_tri);
-            }
-        }
-    }
+    unsigned int z = threadIdx.x;
+    unsigned int y = blockIdx.y;
+    unsigned int x = blockIdx.x;
+    results[z * (X * Y) + y * X + x] = distance_to_mesh(mesh, x, y, z, num_tri);
 }
 
 int main()
 {
-    happly::PLYData plyIn("/Users/maks/PycharmProjects/NewAgate/AgateContour_1008.ply");
+    happly::PLYData plyIn(R"(C:\Users\Maks\CLionProjects\Agate3DEvolver\AgateContour_1008.ply)");
     std::vector<std::array<double, 3>> vPos = plyIn.getVertexPositions();
     std::vector<std::vector<size_t>> fInd = plyIn.getFaceIndices<size_t>();
 
@@ -63,7 +59,7 @@ int main()
     std::cout << fInd.size() << " triangles loaded from mesh! Starting calculations... \n";
     auto start = std::chrono::high_resolution_clock::now();
 
-    calculate_distances<<<1, 1>>>(X, Y, Z, fInd.size(), mesh, results);
+    calculate_distances<<<dim3(X, Y), Z>>>(X, Y, fInd.size(), mesh, results);
 
     cudaDeviceSynchronize();
     auto stop = std::chrono::high_resolution_clock::now();
