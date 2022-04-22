@@ -1,10 +1,10 @@
 #include "mesh_functions_gpu.cuh"
-#include <happly.h> //edited lines 954 & 997: dynamic_cast converted to static_cast (avoid compilation error)
+#include <happly.h> //Lines 997 & 954 dynamic_cast -> static_cast
 #include <algorithm>
 #include <chrono>
 
 __global__
-void calculate_distances(const int X, const int Y, size_t num_tri, triangle *mesh, double *results)
+void calculate_distances(const int X, const int Y, int num_tri, triangle *mesh, double *results)
 {
     unsigned int z = threadIdx.x;
     unsigned int y = blockIdx.y;
@@ -39,8 +39,9 @@ int main()
     const int X = max_x - min_x, Y = max_y - min_y, Z = max_z - min_z;
     triangle *mesh;
     double *results;
-    cudaMallocManaged(&mesh, fInd.size()*sizeof(triangle));
-    cudaMallocManaged(&results, (X * Y * Z)*sizeof(double));
+    cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
+    cudaMallocManaged(&mesh, fInd.size() * sizeof(triangle));
+    cudaMallocManaged(&results, (X * Y * Z) * sizeof(double));
 
     for(size_t i = 0; i < fInd.size(); ++i)
     {
@@ -58,15 +59,13 @@ int main()
     }
     std::cout << fInd.size() << " triangles loaded from mesh! Starting calculations... \n";
     auto start = std::chrono::high_resolution_clock::now();
-
-    calculate_distances<<<dim3(X, Y), Z>>>(X, Y, fInd.size(), mesh, results);
-
+    calculate_distances<<<dim3(X, Y), Z>>>(X, Y, (int)fInd.size(), mesh, results);
     cudaDeviceSynchronize();
     auto stop = std::chrono::high_resolution_clock::now();
     std::cout << "Calculations took: " << std::chrono::duration<double, std::ratio<3600>>(stop - start).count() <<
               " hours\nSaving results to .txt file...\n";
     start = std::chrono::high_resolution_clock::now();
-    std::ofstream out("AgateDistanceMap3.txt", std::ios::out);
+    std::ofstream out("AgateDistanceMap4.txt", std::ios::out);
     for(int z = 0; z < Z; ++z)
     {
         for(int y = 0; y < Y; ++y)

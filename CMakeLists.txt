@@ -8,10 +8,10 @@ if(CMAKE_BUILD_TYPE STREQUAL Release)
 endif()
 
 add_executable(Agate3DEvolver main.cpp mesh_functions.cpp mesh_functions.h)
+target_include_directories(Agate3DEvolver PRIVATE 3rd_party_resources)
 
 if(WIN32)
     add_subdirectory(GPU)
-    target_include_directories(Agate3DEvolver PRIVATE "C:/Programming/Happly/happly")
-else()
-    target_include_directories(Agate3DEvolver PRIVATE /Users/maks/src.git/happly)
+    add_subdirectory(FIM)
+    add_subdirectory(FMM)
 endif()
