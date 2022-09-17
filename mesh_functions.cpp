@@ -1,6 +1,7 @@
 #include "mesh_functions.h"
 
-double distance_to_triangle(triangle t, double px, double py, double pz, size_t& inter)
+double
+distance_to_triangle(triangle t, double px, double py, double pz, size_t &inter, int Y)
 {
     double a, b;
     double d1 = ((t[0][0] - px) * (t[0][0] - px) +
@@ -19,11 +20,16 @@ double distance_to_triangle(triangle t, double px, double py, double pz, size_t&
                     x2 = t[1][0] - t[0][0], y2 = t[1][1] - t[0][1], z2 = t[1][2] - t[0][2],
                     x3 = t[2][0] - t[0][0], y3 = t[2][1] - t[0][1], z3 = t[2][2] - t[0][2];
 
-    const double    a_inter = -(x3 * y1 - x1 * y3) / (x3 * y2 - x2 * y3),
-                    b_inter = (x2 * y1 - x1 * y2) / (x3 * y2 - x2 * y3),
+    const double    k = 1 - (2.0 * py / Y);
+    const double    //a_inter = -(x3 * y1 - x1 * y3) / (x3 * y2 - x2 * y3),
+                    a_inter2    = (k * x3 * z1 - y3 * z1 - k * x1 * z3 + y1 * z3) /
+                                    (y3 * z2 - k * x3 * z2 + k * x2 * z3 - y2 * z3),
+                    //b_inter = (x2 * y1 - x1 * y2) / (x3 * y2 - x2 * y3),
+                    b_inter2    = -1 * (k * x2 * z1 - y2 * z1 - k * x1 * z2 + y1 * z2) /
+                                    (y3 * z2 - k * x3 * z2 + k * x2 * z3 - y2 * z3),
                     x_inter = (x3 * y2 * z1 - x2 * y3 * z1 - x3 * y1 * z2 + x1 * y3 * z2 + x2 * y1 * z3 - x1 * y2 * z3)/
-                                (x3 * y2 - x2 * y3);
-     if(a_inter > 0 && b_inter > 0 && (a_inter + b_inter) < 1 && x_inter > 0) ++inter;
+                                (y3 * z2 - k * x3 * z2 + k * x2 * z3 - y2 * z3);
+     if(a_inter2 > 0 && b_inter2 > 0 && (a_inter2 + b_inter2) < 1 && x_inter > 0) ++inter;
 
     const double d = x3 * x3 * (y2 * y2 + z2 * z2) + (y3 * z2 - y2 * z3) * (y3 * z2 - y2 * z3) -
                      2 * x2 * x3 * (y2 * y3 + z2 * z3) + x2 * x2 * (y3 * y3 + z3 * z3);
@@ -76,14 +82,14 @@ double distance_to_triangle(triangle t, double px, double py, double pz, size_t&
     return std::sqrt(d1);
 }
 
-double distance_to_mesh(triangle *mesh, int x, int y, int z, size_t mesh_size)
+double distance_to_mesh(triangle *mesh, int x, int y, int z, size_t mesh_size, int Y)
 {
     size_t intersected = 0;
-    double d_min = distance_to_triangle(mesh[0], x, y, z, intersected), d;
+    double d_min = distance_to_triangle(mesh[0], x, y, z, intersected, Y), d;
     for(size_t i = 1; i < mesh_size; ++i)
     {
-        d = distance_to_triangle(mesh[i], x, y, z, intersected);
+        d = distance_to_triangle(mesh[i], x, y, z, intersected, Y);
         if(d < d_min) d_min = d;
     }
-    return (intersected % 2 == 0) ? d_min : -d_min;
+    return (intersected % 2 == 0) ? -d_min : d_min;
 }

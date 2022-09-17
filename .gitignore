@@ -4,3 +4,6 @@
 .idea
 /bin/
 /AgateContour_1008.ply
+/AgateContour_0209.ply
+*.bat
+*.ply

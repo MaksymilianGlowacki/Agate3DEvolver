@@ -1,0 +1,20 @@
+import numpy as np
+
+outer = np.loadtxt("/Users/maks/PycharmProjects/MgrObrazki/AgateDistanceMap_final.txt", usecols=3, dtype=float, delimiter=' ')
+outer_fmm = np.loadtxt("/Users/maks/PycharmProjects/MgrObrazki/AgateDistanceMap_fmm.txt", usecols=3, dtype=float, delimiter=' ')
+outer_fim = np.loadtxt("/Users/maks/PycharmProjects/MgrObrazki/AgateDistanceMap_fim.txt", usecols=3, dtype=float, delimiter=' ')
+inner = np.loadtxt("/Users/maks/PycharmProjects/MgrObrazki/AgateDistanceMap_inner_final.txt", usecols=3, dtype=float, delimiter=' ')
+channel = np.loadtxt("/Users/maks/PycharmProjects/MgrObrazki/AgateDistanceMap_channel_final.txt", usecols=3, dtype=float, delimiter=' ')
+size = (360, 210, 300)
+outer = np.reshape(outer, size)
+inner = np.reshape(inner, size)
+channel = np.reshape(channel, size)
+outer_fmm = np.reshape(outer_fmm, (361, 210, 300))
+outer_fim = np.reshape(outer_fim, (360, 360, 360))
+channel = np.where(channel > 0, True, False).astype(bool)
+
+np.save("Outer", outer)
+np.save("Inner", outer)
+np.save("Channel", outer)
+np.save("OuterFMM", outer)
+np.save("OuterFIM", outer)
